@@ -3,6 +3,9 @@ const http = require('http');
 const express = require('express');
 require('cors');
 const socketio = require('socket.io');
+const {generateMessage} = require('../utils/messages');
+
+const chatRouter = require('../routes/chat');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,13 +20,13 @@ const port = process.env.PORT || 3100;
 const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));
+app.use('/chat', chatRouter);
 
-let count = 0;
 
 io.on('connection', (socket) => {
     console.log('New webSocket connection');
     socket.on('sendMessage', (message) => {
-        io.emit('newMessage', message);
+        io.emit('newMessage', generateMessage(message));
     })
 })
 
